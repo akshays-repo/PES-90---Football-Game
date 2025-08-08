@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PES 90 - Football Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-header">
+            <div id="score-board">
+                <div class="team team-a">
+                    <span class="team-name">Team A</span>
+                    <span class="score" id="score-a">0</span>
+                </div>
+                <div class="timer">
+                    <span id="time-display">90</span>
+                </div>
+                <div class="team team-b">
+                    <span class="team-name">Team B</span>
+                    <span class="score" id="score-b">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        
+        <div id="game-controls">
+            <div id="desktop-controls">
+                <p>Controls: Arrow Keys / WASD to move, Space to shoot/pass, Shift to sprint</p>
+            </div>
+            <div id="mobile-controls" style="display: none;">
+                <div class="joystick-area">
+                    <div id="joystick-base">
+                        <div id="joystick-thumb"></div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button id="shoot-btn">Shoot</button>
+                    <button id="sprint-btn">Sprint</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="game-menu" class="overlay">
+            <div class="menu-content">
+                <h1>PES 90</h1>
+                <p>90 seconds of football action!</p>
+                <button id="start-game">Start Game</button>
+                <button id="instructions">How to Play</button>
+            </div>
+        </div>
+        
+        <div id="pause-menu" class="overlay" style="display: none;">
+            <div class="menu-content">
+                <h2>Game Paused</h2>
+                <button id="resume-game">Resume</button>
+                <button id="restart-game">Restart</button>
+                <button id="quit-game">Quit to Menu</button>
+            </div>
+        </div>
+        
+        <div id="game-over" class="overlay" style="display: none;">
+            <div class="menu-content">
+                <h2>Game Over</h2>
+                <div id="final-score"></div>
+                <button id="play-again">Play Again</button>
+                <button id="back-to-menu">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/engine/GameEngine.js"></script>
+    <script src="js/entities/Entity.js"></script>
+    <script src="js/entities/Player.js"></script>
+    <script src="js/entities/Ball.js"></script>
+    <script src="js/entities/Team.js"></script>
+    <script src="js/entities/Goal.js"></script>
+    <script src="js/entities/Field.js"></script>
+    <script src="js/input/InputManager.js"></script>
+    <script src="js/ai/AIManager.js"></script>
+    <script src="js/physics/PhysicsEngine.js"></script>
+    <script src="js/render/Renderer.js"></script>
+    <script src="js/scenes/GameScene.js"></script>
+    <script src="js/scenes/MenuScene.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 
