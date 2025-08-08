@@ -1,6 +1,6 @@
 # PES 90 - Football Game
 
-A browser-based football (soccer) game inspired by Pro Evolution Soccer, featuring 90-second matches with fast-paced arcade-style gameplay.
+PES 90 — A 90‑second, browser‑based football game with smooth physics, simple AI, and responsive controls. Built with HTML5 Canvas and vanilla JavaScript.
 
 ## 🎮 Features
 
@@ -44,13 +44,14 @@ npx http-server
 
 ### Desktop Controls
 - **Arrow Keys** or **WASD** - Move player
-- **Spacebar** - Shoot/Pass
+- **Spacebar** - Shoot
+- **P** - Pass
 - **Shift** - Sprint
 - **Enter** - Pause/Resume
 
 ### Mobile Controls
 - **Joystick** - Move player
-- **Shoot button** - Shoot/Pass
+- **Shoot button** - Shoot
 - **Sprint button** - Sprint
 
 ### Game Rules
@@ -59,37 +60,43 @@ npx http-server
 - Pass to teammates or shoot directly at the goal
 - Use sprint sparingly as it consumes stamina
 
+## 📚 Documentation
+
+- Product Requirements: `doc/prd.md`
+- Entities & Core Systems (student-friendly): `doc/entities-and-core-systems.md`
+
 ## 🏗️ Project Structure
 
 ```
 pes90engine/
 ├── index.html              # Main HTML file
 ├── css/
-│   └── style.css          # Game styling
+│   └── style.css           # Game styling
 ├── js/
-│   ├── main.js            # Main game initialization
+│   ├── main.js             # Main game initialization
 │   ├── engine/
-│   │   └── GameEngine.js  # Core game engine
+│   │   └── GameEngine.js   # Core game engine
 │   ├── entities/
-│   │   ├── Entity.js      # Base entity class
-│   │   ├── Player.js      # Player class
-│   │   ├── Ball.js        # Ball physics
-│   │   ├── Team.js        # Team management
-│   │   ├── Goal.js        # Goal detection
-│   │   └── Field.js       # Field rendering
+│   │   ├── Entity.js       # Base entity class
+│   │   ├── Player.js       # Player class
+│   │   ├── Ball.js         # Ball physics
+│   │   ├── Team.js         # Team management
+│   │   ├── Goal.js         # Goal detection
+│   │   └── Field.js        # Field rendering
 │   ├── input/
 │   │   └── InputManager.js # Input handling
 │   ├── ai/
-│   │   └── AIManager.js   # AI behavior
+│   │   └── AIManager.js    # AI behavior
 │   ├── physics/
 │   │   └── PhysicsEngine.js # Physics simulation
 │   ├── render/
-│   │   └── Renderer.js    # Rendering system
+│   │   └── Renderer.js     # Rendering system
 │   └── scenes/
-│       ├── MenuScene.js   # Main menu
-│       └── GameScene.js   # Game scene
+│       ├── MenuScene.js    # Main menu
+│       └── GameScene.js    # Game scene
 └── doc/
-    └── prd.md             # Product Requirements Document
+    ├── prd.md                      # Product Requirements Document
+    └── entities-and-core-systems.md # Entities & Core Systems guide
 ```
 
 ## 🛠️ Technical Details
