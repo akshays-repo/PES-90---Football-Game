@@ -1,0 +1,12 @@
+{
+  "name": "pes90engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PES 90 - Football Game",
+  "scripts": {
+    "test": "jest --runInBand"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+} 

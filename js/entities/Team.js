@@ -147,4 +147,9 @@ class Team {
             ];
         }
     }
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Team;
 } 

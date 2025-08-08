@@ -150,4 +150,9 @@ class Goal extends Entity {
             bottom: this.y + this.height / 2
         };
     }
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Goal;
 } 

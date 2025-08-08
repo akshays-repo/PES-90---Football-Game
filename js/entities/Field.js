@@ -213,4 +213,9 @@ class Field extends Entity {
             };
         }
     }
-} 
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Field;
+}

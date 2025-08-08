@@ -131,7 +131,8 @@ class PhysicsEngine {
     }
     
     keepInBounds(entity) {
-        const canvas = window.gameEngine.canvas;
+        const canvas = (typeof window !== 'undefined' && window.gameEngine && window.gameEngine.canvas) ? window.gameEngine.canvas : null;
+        if (!canvas) return; // In tests or non-DOM environment, skip bounds
         const margin = entity.width / 2;
         
         // Horizontal bounds
@@ -193,4 +194,9 @@ class PhysicsEngine {
         this.entities = [];
         this.collisionPairs = [];
     }
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = PhysicsEngine;
 } 

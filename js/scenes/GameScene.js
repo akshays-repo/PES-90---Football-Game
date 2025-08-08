@@ -20,7 +20,10 @@ class GameScene {
         this.playerControlled = null;
         this.matchStarted = false;
         this.kickoffTimer = 0;
-        this.kickoffDelay = 2000; // 2 seconds
+        this.kickoffDelay = 2.0; // seconds
+        
+        // Camera behavior
+        this.staticCamera = true;
         
         this.init();
     }
@@ -153,12 +156,12 @@ class GameScene {
         this.active = false;
     }
     
-    update(deltaTime) {
+    update(deltaTimeSec) {
         if (!this.active) return;
         
         // Handle kickoff delay
         if (!this.matchStarted) {
-            this.kickoffTimer += deltaTime;
+            this.kickoffTimer += deltaTimeSec;
             if (this.kickoffTimer >= this.kickoffDelay) {
                 this.matchStarted = true;
             }
@@ -166,6 +169,11 @@ class GameScene {
         
         // Update input
         this.inputManager.update();
+        
+        // Switch player on one-shot input
+        if (this.inputManager.wasSwitchPressed()) {
+            this.switchControlledPlayer();
+        }
         
         // Update player input
         if (this.playerControlled) {
@@ -180,23 +188,27 @@ class GameScene {
         }
         
         // Update physics
-        this.physicsEngine.update(deltaTime);
+        this.physicsEngine.update(deltaTimeSec);
         
         // Update AI
-        this.aiManager.update(deltaTime);
+        this.aiManager.update(deltaTimeSec * 1000); // AI manager uses ms internally
         
         // Update teams
         Object.values(this.teams).forEach(team => {
-            team.update(deltaTime);
+            team.update(deltaTimeSec);
         });
         
         // Update goals
         Object.values(this.goals).forEach(goal => {
-            goal.update(deltaTime);
+            goal.update(deltaTimeSec * 1000); // goal glow uses delta decay per ms
         });
         
-        // Update renderer
-        this.renderer.followEntity(this.ball);
+        // Update renderer (keep scene static unless explicitly disabled)
+        if (this.staticCamera) {
+            this.renderer.setCamera(0, 0, 1);
+        } else if (this.ball && this.field) {
+            this.renderer.followEntityClamped(this.ball, this.field.fieldWidth, this.field.fieldHeight);
+        }
     }
     
     render(ctx) {
@@ -250,6 +262,56 @@ class GameScene {
     
     getPlayerControlled() {
         return this.playerControlled;
+    }
+    
+    // Player switching
+    switchControlledPlayer() {
+        const teamA = this.teams.teamA;
+        if (!teamA) return;
+        const candidates = teamA.getFieldPlayers();
+        if (!candidates || candidates.length === 0) return;
+        
+        let next = null;
+        // Prefer nearest to ball if ball exists and is not already possessed by current
+        if (this.ball) {
+            let bestPlayer = null;
+            let bestDistSq = Infinity;
+            for (const p of candidates) {
+                if (p === this.playerControlled) continue;
+                const dx = p.x - this.ball.x;
+                const dy = p.y - this.ball.y;
+                const d2 = dx * dx + dy * dy;
+                if (d2 < bestDistSq) {
+                    bestDistSq = d2;
+                    bestPlayer = p;
+                }
+            }
+            next = bestPlayer;
+        }
+        
+        // Fallback: cycle by index order
+        if (!next) {
+            const idx = candidates.indexOf(this.playerControlled);
+            next = candidates[(idx + 1) % candidates.length];
+        }
+        
+        if (next && next !== this.playerControlled) {
+            const previous = this.playerControlled;
+            
+            // Previous becomes AI
+            if (previous) {
+                previous.isAI = true;
+                const aiList = this.aiManager.getAIPlayers?.() || [];
+                if (!aiList.includes(previous)) {
+                    this.aiManager.addAIPlayer?.(previous);
+                }
+            }
+            
+            // New controlled becomes human
+            next.isAI = false;
+            this.aiManager.removeAIPlayer?.(next);
+            this.playerControlled = next;
+        }
     }
     
     // Game state methods

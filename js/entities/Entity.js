@@ -14,14 +14,14 @@ class Entity {
         this.tag = 'entity';
     }
     
-    update(deltaTime) {
+    update(deltaTimeSec) {
         if (!this.active) return;
         
-        // Apply acceleration
-        this.velocityX += this.accelerationX * deltaTime;
-        this.velocityY += this.accelerationY * deltaTime;
+        // Apply acceleration (per second)
+        this.velocityX += this.accelerationX * deltaTimeSec;
+        this.velocityY += this.accelerationY * deltaTimeSec;
         
-        // Apply friction
+        // Apply friction per tick
         this.velocityX *= this.friction;
         this.velocityY *= this.friction;
         
@@ -32,9 +32,9 @@ class Entity {
             this.velocityY = (this.velocityY / speed) * this.maxSpeed;
         }
         
-        // Update position
-        this.x += this.velocityX * deltaTime;
-        this.y += this.velocityY * deltaTime;
+        // Update position (per second)
+        this.x += this.velocityX * deltaTimeSec;
+        this.y += this.velocityY * deltaTimeSec;
     }
     
     render(ctx) {
@@ -94,4 +94,9 @@ class Entity {
         this.velocityX += x;
         this.velocityY += y;
     }
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Entity;
 } 

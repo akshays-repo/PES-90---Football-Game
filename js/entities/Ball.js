@@ -225,4 +225,9 @@ class Ball extends Entity {
     isMoving() {
         return this.getSpeed() > 5;
     }
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Ball;
 } 

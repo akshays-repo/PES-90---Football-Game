@@ -12,6 +12,8 @@ class InputManager {
         this.inputPass = false;
         this.inputSprint = false;
         this.inputPause = false;
+        // Latched action inputs
+        this.switchPressed = false;
         
         // Mobile joystick
         this.joystickBase = null;
@@ -203,6 +205,11 @@ class InputManager {
                     window.gameEngine.resumeGame();
                 }
                 break;
+            case 'KeyQ':
+            case 'Tab':
+                // Latch switch action on press (one-shot)
+                this.switchPressed = true;
+                break;
         }
     }
     
@@ -308,7 +315,7 @@ class InputManager {
             'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
             'KeyA', 'KeyD', 'KeyW', 'KeyS',
             'Space', 'KeyP', 'ShiftLeft', 'ShiftRight',
-            'Enter'
+            'Enter', 'KeyQ', 'Tab'
         ];
         return gameKeys.includes(code);
     }
@@ -322,6 +329,12 @@ class InputManager {
         return Object.values(this.keys).some(pressed => pressed);
     }
     
+    wasSwitchPressed() {
+        const pressed = this.switchPressed;
+        this.switchPressed = false;
+        return pressed;
+    }
+    
     clearInput() {
         this.inputX = 0;
         this.inputY = 0;
@@ -329,5 +342,6 @@ class InputManager {
         this.inputPass = false;
         this.inputSprint = false;
         this.inputPause = false;
+        this.switchPressed = false;
     }
 } 

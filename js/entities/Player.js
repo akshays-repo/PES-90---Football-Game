@@ -45,12 +45,12 @@ class Player extends Entity {
         
         // Update kick cooldown
         if (this.kickCooldown > 0) {
-            this.kickCooldown -= deltaTime;
+            this.kickCooldown -= deltaTime * 1000; // cooldown is in ms
         }
         
         // Update AI
         if (this.isAI) {
-            this.updateAI(deltaTime);
+            this.updateAI(deltaTime * 1000); // AI timers in ms
         }
         
         // Handle movement
@@ -63,7 +63,7 @@ class Player extends Entity {
         this.updateAnimation(deltaTime);
         
         // Update stamina
-        this.updateStamina(deltaTime);
+        this.updateStamina(deltaTime * 1000); // stamina tuned per ms
     }
     
     handleMovement(deltaTime) {
@@ -91,11 +91,12 @@ class Player extends Entity {
             
             // Apply sprint multiplier
             const speedMultiplier = this.isSprinting ? this.sprintMultiplier : 1.0;
-            const currentSpeed = this.maxSpeed * this.speed * speedMultiplier;
+            const currentSpeed = this.maxSpeed * this.speed * speedMultiplier; // pixels/sec
             
-            // Set acceleration
-            this.accelerationX = moveX * currentSpeed * 0.1;
-            this.accelerationY = moveY * currentSpeed * 0.1;
+            // Scale acceleration for seconds-based dt (was tuned for ms)
+            const accelerationScale = 100; // compensates ms->sec change
+            this.accelerationX = moveX * currentSpeed * accelerationScale;
+            this.accelerationY = moveY * currentSpeed * accelerationScale;
             
             // Update direction
             this.direction = Math.atan2(moveY, moveX);
@@ -132,7 +133,7 @@ class Player extends Entity {
     kickBall(type) {
         if (!this.ball || this.kickCooldown > 0) return;
         
-        const kickPower = type === 'shoot' ? 300 : 200;
+        const kickPower = type === 'shoot' ? 300 : 200; // pixels/sec
         const kickAngle = this.direction;
         
         // Add some randomness for realism
@@ -147,7 +148,7 @@ class Player extends Entity {
         this.ball.setVelocity(kickX, kickY);
         this.ball.setPossessor(null);
         this.hasBall = false;
-        this.kickCooldown = 500; // 500ms cooldown
+        this.kickCooldown = 500; // ms
         
         // Reset input
         this.inputShoot = false;
@@ -242,7 +243,7 @@ class Player extends Entity {
     updateAnimation(deltaTime) {
         const speed = Math.sqrt(this.velocityX * this.velocityX + this.velocityY * this.velocityY);
         if (speed > 10) {
-            this.animationFrame += this.animationSpeed * deltaTime;
+            this.animationFrame += this.animationSpeed * (deltaTime * 1000);
         }
     }
     
@@ -270,6 +271,10 @@ class Player extends Entity {
         // Draw player body
         ctx.fillStyle = this.color;
         ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        // Add stroke for visibility
+        ctx.strokeStyle = '#222222';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
         
         // Draw direction indicator
         ctx.fillStyle = '#ffffff';
@@ -312,4 +317,9 @@ class Player extends Entity {
     setBall(ball) {
         this.ball = ball;
     }
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Player;
 } 

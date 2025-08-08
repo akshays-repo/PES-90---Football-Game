@@ -107,6 +107,9 @@ class Renderer {
         
         // Render player stats (if needed)
         this.renderPlayerStats();
+        
+        // Render speed meter (configurable)
+        this.renderSpeedMeter(scene);
     }
     
     renderScore() {
@@ -180,6 +183,82 @@ class Renderer {
         this.ctx.fillText('Stamina', barX, barY - 5);
     }
     
+    // Speed meter HUD
+    renderSpeedMeter(scene) {
+        const cfg = (window.getSetting && window.getSetting('ui.speedMeter')) || null;
+        if (!cfg || !cfg.enabled) return;
+        
+        // Determine source entity
+        let entity = null;
+        if (cfg.source === 'ball') {
+            entity = scene.ball;
+        } else {
+            entity = scene.getPlayerControlled();
+        }
+        if (!entity) return;
+        
+        // Compute instantaneous speed in pixels/sec
+        const vx = entity.velocityX || 0;
+        const vy = entity.velocityY || 0;
+        const speedPxPerSec = Math.sqrt(vx * vx + vy * vy);
+        
+        // Convert to configured unit
+        const unit = (window.getSetting && window.getSetting('units.speed', 'mph')) || 'mph';
+        const ppm = (window.getSetting && window.getSetting('units.pixelsPerMeter', 8)) || 8;
+        // pixels/sec -> meters/sec
+        const speedMps = speedPxPerSec / ppm;
+        let speedValue = speedMps;
+        let unitLabel = 'm/s';
+        if (unit === 'kmh' || unit === 'km/h') {
+            speedValue = speedMps * 3.6;
+            unitLabel = 'km/h';
+        } else if (unit === 'mph') {
+            speedValue = speedMps * 2.23693629;
+            unitLabel = 'mph';
+        }
+        
+        // Optional smoothing
+        if (this._speedMeterSmoothed == null) this._speedMeterSmoothed = 0;
+        const smoothing = typeof cfg.smoothing === 'number' ? cfg.smoothing : 0.25;
+        this._speedMeterSmoothed = this._speedMeterSmoothed * smoothing + speedValue * (1 - smoothing);
+        const displayValue = this._speedMeterSmoothed;
+        
+        // Layout
+        const width = (cfg.size && cfg.size.width) || 160;
+        const height = (cfg.size && cfg.size.height) || 50;
+        let x = (cfg.position && cfg.position.x) || null;
+        let y = (cfg.position && cfg.position.y) || null;
+        const margin = (cfg.position && cfg.position.margin) || 12;
+        const anchor = (cfg.position && cfg.position.anchor) || 'bottom-right';
+        
+        if (x == null || y == null) {
+            switch (anchor) {
+                case 'top-left':
+                    x = margin; y = margin; break;
+                case 'top-right':
+                    x = this.canvas.width - width - margin; y = margin; break;
+                case 'bottom-left':
+                    x = margin; y = this.canvas.height - height - margin; break;
+                case 'bottom-right':
+                default:
+                    x = this.canvas.width - width - margin; y = this.canvas.height - height - margin; break;
+            }
+        }
+        
+        // Draw panel
+        const bg = (cfg.colors && cfg.colors.background) || 'rgba(0,0,0,0.65)';
+        const textColor = (cfg.colors && cfg.colors.text) || '#ffffff';
+        const accent = (cfg.colors && cfg.colors.accent) || '#ffd700';
+        this.drawRect(x, y, width, height, { fillColor: bg, strokeColor: 'rgba(255,255,255,0.2)', lineWidth: 1 });
+        
+        // Label
+        this.drawText('Speed', x + 10, y + 8, { font: '12px Arial', color: textColor, align: 'left', baseline: 'top' });
+        
+        // Value
+        const valueStr = `${Math.round(displayValue).toString()} ${unitLabel}`;
+        this.drawText(valueStr, x + width - 10, y + height / 2 + 6, { font: '20px Arial', color: accent, align: 'right', baseline: 'middle' });
+    }
+    
     // Camera methods
     setCamera(x, y, zoom = 1) {
         this.camera.x = x;
@@ -195,6 +274,18 @@ class Renderer {
         
         this.camera.x = entity.x - centerX;
         this.camera.y = entity.y - centerY;
+    }
+    
+    followEntityClamped(entity, worldWidth, worldHeight) {
+        if (!entity) return;
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        let targetX = entity.x - centerX;
+        let targetY = entity.y - centerY;
+        const maxX = Math.max(0, worldWidth - this.canvas.width);
+        const maxY = Math.max(0, worldHeight - this.canvas.height);
+        this.camera.x = Math.min(Math.max(0, targetX), maxX);
+        this.camera.y = Math.min(Math.max(0, targetY), maxY);
     }
     
     // Particle system

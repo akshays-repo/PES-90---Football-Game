@@ -7,7 +7,7 @@ class GameEngine {
         this.isRunning = false;
         this.lastTime = 0;
         this.deltaTime = 0;
-        this.fixedTimeStep = 16.67; // 60 FPS
+        this.fixedTimeStep = 16.67; // 60 FPS (ms)
         this.accumulator = 0;
         
         // Game state
@@ -44,7 +44,7 @@ class GameEngine {
     gameLoop(currentTime = 0) {
         if (!this.isRunning) return;
         
-        // Calculate delta time
+        // Calculate delta time (ms)
         this.deltaTime = currentTime - this.lastTime;
         this.lastTime = currentTime;
         
@@ -63,9 +63,12 @@ class GameEngine {
         requestAnimationFrame((time) => this.gameLoop(time));
     }
     
-    update(deltaTime) {
+    update(deltaTimeMs) {
+        // Convert to seconds for game logic/physics
+        const dt = deltaTimeMs / 1000;
+        
         if (this.currentScene) {
-            this.currentScene.update(deltaTime);
+            this.currentScene.update(dt);
         }
         
         // Update match timer
@@ -188,4 +191,9 @@ class GameEngine {
     isMobile() {
         return window.innerWidth <= 768;
     }
+}
+
+// Node export for tests
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = GameEngine;
 } 
